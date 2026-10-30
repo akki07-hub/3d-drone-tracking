@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indoor 3D Drone Tracking Using Multimodal Data</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="sidebar">
+        <h2>DroneTracker Pro</h2>
+        <ul>
+            <li class="active" data-target="overview">Overview</li>
+            <li data-target="case-study">Case Study</li>
+            <li data-target="simulation">3D Simulation</li>
+            <li data-target="dashboard">Live Dashboard</li>
+            <li data-target="analytics">Analytics</li>
+            <li data-target="architecture">System Architecture</li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <!-- Overview Section -->
+        <section id="overview" class="page active">
+            <h1>Indoor 3D Drone Tracking Using Multimodal Data</h1>
+            <p class="subtitle">A Multimodal Sensor Fusion Approach for GPS-Denied Environments</p>
+            <div class="card">
+                <h3>Project Objective</h3>
+                <p>Track a drone's 3D position and movement by combining multiple sensor modalities (Camera, Depth/LiDAR, and IMU) to overcome the challenges of indoor tracking where GPS signals are unavailable.</p>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h4>System Status</h4>
+                    <p class="status green">Online - Ready</p>
+                </div>
+                <div class="metric-card">
+                    <h4>Fusion Mode</h4>
+                    <p>Camera + Depth + IMU</p>
+                </div>
+                <div class="metric-card">
+                    <h4>Est. Latency</h4>
+                    <p>12 ms</p>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn primary" onclick="switchTab('simulation')">Launch Simulation</button>
+                <button class="btn secondary" onclick="switchTab('case-study')">Read Case Study</button>
+            </div>
+        </section>
+
+        <!-- Case Study Section -->
+        <section id="case-study" class="page">
+            <h1>Case Study & Research</h1>
+            
+            <h3>Problem Statement</h3>
+            <p>Indoor drone tracking is challenging because GPS signals are weak, highly attenuated, or completely unavailable inside buildings due to concrete and steel structures. This creates a reliance on alternative indoor positioning systems.</p>
+            
+            <h3>Objective</h3>
+            <p>To accurately track a drone's 3D position and movement in real-time by combining multiple sensor modalities to compensate for individual sensor weaknesses.</p>
+
+            <h3>Proposed Solution</h3>
+            <p>A multimodal tracking framework leveraging:</p>
+            <ul>
+                <li><strong>Camera Imagery:</strong> For visual odometry and feature tracking.</li>
+                <li><strong>Depth/LiDAR Data:</strong> For precise distance measurement and 3D point cloud generation.</li>
+                <li><strong>IMU Measurements:</strong> For high-frequency acceleration and angular velocity readings to track rapid movements.</li>
+            </ul>
+
+            <h3>Methodology</h3>
+            <p>Sensor acquisition &rarr; Preprocessing &rarr; Feature extraction &rarr; Sensor fusion (e.g., Extended Kalman Filter) &rarr; Position estimation &rarr; Visualization.</p>
+
+            <h3>Applications</h3>
+            <p>Warehouses, industrial inspection, indoor navigation, search and rescue operations, and automated inventory management.</p>
+
+            <h3>Challenges</h3>
+            <p>Occlusion, rapid lighting changes, sensor noise, IMU drift over time, and obstacle avoidance in cluttered environments.</p>
+
+            <h3>Evaluation Metrics</h3>
+            <p>Position error (RMSE), tracking stability, latency, and obstacle detection accuracy.</p>
+
+            <h3>Limitations and Future Scope</h3>
+            <p>Limitations include computational constraints for real-time processing on edge devices. Future scope includes real hardware integration, full Simultaneous Localization and Mapping (SLAM), visual-inertial odometry (VIO), and AI-based object detection for dynamic obstacle avoidance.</p>
+            
+            <p><em>References: Simulated references based on standard indoor tracking literature (e.g., "Visual-Inertial Navigation Systems", "LiDAR-based SLAM in GPS-denied environments").</em></p>
+        </section>
+
+        <!-- 3D Simulation Section -->
+        <section id="simulation" class="page">
+            <h1>3D Indoor Simulation</h1>
+            <div class="sim-container">
+                <div id="three-canvas"></div>
+                <div class="sim-overlay">
+                    <div class="hud-overlay" id="hud">
+                        <strong>X:</strong> <span id="hud-x">0.00</span> 
+                        <strong>Y:</strong> <span id="hud-y">0.00</span> 
+                        <strong>Z:</strong> <span id="hud-z">0.00</span> | 
+                        <strong>Alt:</strong> <span id="hud-alt">0.00</span>m | 
+                        <strong>Spd:</strong> <span id="hud-spd">0.00</span>m/s | 
+                        <strong>Hdg:</strong> <span id="hud-hdg">0</span>&deg;
+                    </div>
+                    <div class="controls-hint">
+                        <strong>Controls:</strong> WASD = Move | Q/E = Up/Down | Shift = Boost | R = Reset
+                    </div>
+                    <div class="sim-buttons">
+                        <button class="btn sim-btn" id="btn-start">Start</button>
+                        <button class="btn sim-btn" id="btn-camera">Toggle FPV</button>
+                        <button class="btn sim-btn" id="btn-demo">Auto-Fly</button>
+                    </div>
+                    
+                    <!-- Joysticks -->
+                    <div id="joystick-left" class="joystick-zone">
+                        <div class="joystick-base"><div class="joystick-stick"></div></div>
+                    </div>
+                    <div id="joystick-right" class="joystick-zone">
+                        <div class="joystick-base"><div class="joystick-stick"></div></div>
+                    </div>
+
+                    <div class="minimap-container">
+                        <canvas id="minimap"></canvas>
+                    </div>
+                    <div id="obstacle-warning" class="warning hidden">OBSTACLE PROXIMITY WARNING</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Dashboard Section -->
+        <section id="dashboard" class="page">
+            <h1>Live Multimodal Dashboard</h1>
+            <div class="dashboard-grid">
+                <div class="dash-panel telemetry">
+                    <h3>Live Telemetry</h3>
+                    <div class="tel-grid">
+                        <div><strong>X:</strong> <span id="tel-x">0.00</span> m</div>
+                        <div><strong>Y (Alt):</strong> <span id="tel-y">0.00</span> m</div>
+                        <div><strong>Z:</strong> <span id="tel-z">0.00</span> m</div>
+                        <div><strong>Velocity:</strong> <span id="tel-v">0.00</span> m/s</div>
+                        <div><strong>Heading:</strong> <span id="tel-h">0.00</span>&deg;</div>
+                        <div><strong>Distance:</strong> <span id="tel-d">0.00</span> m</div>
+                        <div><strong>Flight Time:</strong> <span id="tel-t">00:00</span></div>
+                        <div><strong>Status:</strong> <span id="tel-status" class="status green">Landed</span></div>
+                    </div>
+                </div>
+                
+                <div class="dash-panel camera-view">
+                    <h3>Simulated Camera View (RGB)</h3>
+                    <div class="sensor-placeholder" id="camera-feed">
+                        [Camera Feed Active]
+                    </div>
+                </div>
+                
+                <div class="dash-panel depth-view">
+                    <h3>Depth / LiDAR Point Cloud</h3>
+                    <div class="sensor-placeholder depth-placeholder" id="depth-feed">
+                        [Depth Data Active]
+                    </div>
+                </div>
+
+                <div class="dash-panel imu-view">
+                    <h3>IMU Readings</h3>
+                    <div class="tel-grid">
+                        <div><strong>Acc X:</strong> <span id="imu-ax">0.00</span></div>
+                        <div><strong>Acc Y:</strong> <span id="imu-ay">9.81</span></div>
+                        <div><strong>Acc Z:</strong> <span id="imu-az">0.00</span></div>
+                        <div><strong>Gyro X:</strong> <span id="imu-gx">0.00</span></div>
+                        <div><strong>Gyro Y:</strong> <span id="imu-gy">0.00</span></div>
+                        <div><strong>Gyro Z:</strong> <span id="imu-gz">0.00</span></div>
+                    </div>
+                </div>
+                
+                <div class="dash-panel fusion-view">
+                    <h3>Sensor Fusion Status</h3>
+                    <div class="fusion-status">
+                        <div class="sensor-indicator active">Camera (OK)</div>
+                        <div class="sensor-indicator active">LiDAR (OK)</div>
+                        <div class="sensor-indicator active">IMU (OK)</div>
+                    </div>
+                    <p><strong>Estimated Position Error:</strong> <span id="fusion-error">0.02</span> m</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="page">
+            <h1>Analytics & Trajectory Evaluation</h1>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <canvas id="posChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="altChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="errChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Architecture Section -->
+        <section id="architecture" class="page">
+            <h1>System Architecture</h1>
+            <div class="card architecture-card">
+                <h3>Multimodal Tracking Workflow</h3>
+                <div class="diagram-placeholder">
+                    <pre>
+[Sensors]
+   |--> RGB Camera -------> [Visual Feature Extraction] --\
+   |--> LiDAR/Depth ------> [Point Cloud Odometry] -------> [Sensor Fusion (EKF)] --> [3D Pose Estimation]
+   |--> IMU --------------> [Inertial Odometry] --------/
+
+[Dashboard] <-----------------------------------------------------------------------------/
+                    </pre>
+                </div>
+                <h3>Why Sensor Fusion?</h3>
+                <p>Individual sensors have flaws. Cameras struggle in low light or textureless walls. LiDAR can be confused by glass or highly reflective surfaces. IMUs suffer from rapid drift due to double integration of acceleration. Fusing these modalities (e.g., using an Extended Kalman Filter) allows the system to cross-validate measurements and maintain accurate 3D tracking even if one sensor temporarily fails.</p>
+            </div>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
